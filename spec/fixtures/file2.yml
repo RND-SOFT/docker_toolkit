@@ -1,0 +1,10 @@
+version: "3.4"
+services:
+  base:
+    image: aaaa
+    networks:
+      - bus2
+    deploy:
+      limits:
+        memory: 0G
+        test: 1111

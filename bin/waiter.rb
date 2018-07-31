@@ -68,7 +68,6 @@ OptionParser.new do |o|
   o.on('-q --quiet', ' Do not output any status messages') do
     @opts[:quiet] = true
   end
-
 end.parse!
 
 def log(message)
@@ -222,4 +221,3 @@ if @opts[:tcp]
     complete!(success)
   end
 end
-

@@ -5,7 +5,7 @@ gemspec
 
 group :test do
   gem 'awesome_print'
-  gem 'byebug'
+  #  gem 'byebug'
   gem 'faker'
   gem 'faker-russian'
   gem 'rspec'

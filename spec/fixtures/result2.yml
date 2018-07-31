@@ -1,0 +1,19 @@
+version: "3.4"
+services:
+  db:
+    image: postgres:9.6
+    networks:
+      - bus2
+      - bus
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    deploy:
+      limits:
+        memory: 2G
+        test: 1111
+      restart_policy:
+        condition: on-failure
+        delay: 5s

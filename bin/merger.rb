@@ -2,10 +2,13 @@
 
 require 'yaml'
 
-unless ENV['COMPOSE_FILE']
-  STDERR.puts 'COMPOSE_FILE environment must point to one on mo files'
-  exit 1
+if $PROGRAM_NAME == __FILE__
+  unless ENV['COMPOSE_FILE']
+    STDERR.puts 'COMPOSE_FILE environment must point to one on mo files'
+    exit 1
+  end
 end
+
 
 class Hash
 
@@ -88,20 +91,24 @@ def process_compose_hash(yml, parent = {})
   yml
 end
 
-result = ENV['COMPOSE_FILE'].split(':').reduce({}) do |parent, file|
-  yml = process_compose_hash(YAML.safe_load(File.read(file)), parent)
+if $PROGRAM_NAME == __FILE__
 
-  if yml['version'] && parent['version'] && yml['version'] != parent['version']
-    raise "version mismatch: #{file}"
+  result = ENV['COMPOSE_FILE'].split(':').reduce({}) do |parent, file|
+    yml = process_compose_hash(YAML.safe_load(File.read(file)), parent)
+
+    if yml['version'] && parent['version'] && yml['version'] != parent['version']
+      raise "version mismatch: #{file}"
+    end
+
+    ret = extend_hash(parent.deep_dup, yml)
+
+    ret
   end
 
-  ret = extend_hash(parent.deep_dup, yml)
+  if ARGV[0].nil? || ARGV[0].strip == '-'
+    puts YAML.dump(result)
+  else
+    File.write(ARGV[0].strip, YAML.dump(result))
+  end
 
-  ret
-end
-
-if ARGV[0].nil? || ARGV[0].strip == '-'
-  puts YAML.dump(result)
-else
-  File.write(ARGV[0].strip, YAML.dump(result))
 end
