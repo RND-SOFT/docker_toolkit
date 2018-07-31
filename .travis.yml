@@ -3,7 +3,6 @@ rvm:
   - 2.1
   - 2.5
 
-jobs:
-  include:
-    - stage: test
-    - script: bundle exec rspec
+stage: test
+script:
+  - bundle exec rspec
