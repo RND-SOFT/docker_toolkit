@@ -56,7 +56,7 @@ RSpec.describe 'waiter.rb' do
     let(:exec_cmd){ "echo '#{content}' > #{result_file}" }
 
     it 'wait for TCP timedout' do
-      system("#{waiter_cmd} --tcp localhost:#{@port + 11} -- #{exec_cmd}")
+      system("#{waiter_cmd} --tcp localhost:#{@port + 42} -- #{exec_cmd}")
       expect($CHILD_STATUS.success?).to be_falsey
       expect(File.read(result_file)).not_to be eq content
     end

@@ -10,8 +10,14 @@ STDERR.sync = true
 
 @opts = {}
 
+@opts[:exec] = (begin
+                  ARGV.join(' ').split(' -- ')[1].strip
+                rescue StandardError
+                  nil
+                end)
+
 parser = OptionParser.new do |o|
-  o.banner = 'Usage: consul.rb [options]'
+  o.banner = 'Usage: consul.rb [options] -- exec'
 
   o.on('--consul url', 'Set up a custom Consul URL') do |url|
     Diplomat.configure do |config|
@@ -49,6 +55,26 @@ parser = OptionParser.new do |o|
 
   o.on('-d', '--dereference', 'dereference consul values in form of "consul://key/subkey"') do
     @opts[:dereference] = true
+  end
+
+  o.on('--env prefix', 'export KV values from prefix as env varaibles') do |prefix|
+    @opts[:env] = (prefix + '/').gsub('//', '/')
+  end
+
+  o.on('--export', 'add export to --env output') do
+    @opts[:export] = true
+  end
+
+  o.on('--pristine', "not include the parent processes' environment when exec child process") do
+    @opts[:pristine] = true
+  end
+
+  o.on('--put path:value', 'put value to path') do |path|
+    @opts[:put] = path.strip
+  end
+
+  o.on('--get path', 'get value from') do |path|
+    @opts[:get] = path.strip
   end
 end
 parser.parse!
@@ -116,9 +142,9 @@ if @opts[:show]
     cfg = config[service] ||= []
 
     env.each_pair do |key, value|
-      if @opts[:dereference] && value[/^consul:\/\//]
+      if @opts[:dereference] && value && value[/^consul:\/\//]
         reference_path = value.gsub(/^consul:\/\//, '')
-        value = Diplomat::Kv.get(reference_path) || die("Can't get #{reference_path} from Consul")
+        value = Diplomat::Kv.get(reference_path)
       end
       cfg.push(
         env: key.upcase.gsub(/[^0-9a-z]/i, '_'),
@@ -128,6 +154,62 @@ if @opts[:show]
   end
 
   STDOUT.puts JSON.pretty_generate(config)
+
+  exit 0
+end
+
+if put = @opts[:put]
+  path, *value = put.split(':').map(&:strip)
+  value = value.join(':')
+  value = File.read(value) if @opts[:upload] && value && File.exist?(value)
+
+  Diplomat::Kv.put(path, (value || '').strip) || die("Can't put #{path} to Consul")
+
+  exit 0
+end
+
+if path = @opts[:get]
+  value = Diplomat::Kv.get(path)
+  if @opts[:dereference] && value && value[/^consul:\/\//]
+    reference_path = value.gsub(/^consul:\/\//, '')
+    value = Diplomat::Kv.get(reference_path)
+  end
+
+  STDOUT.puts (value || '').strip
+
+  exit 0
+end
+
+if prefix = @opts[:env]
+  keys = Diplomat::Kv.get(prefix, keys: true) || die("Can't get keys at #{prefix} from Consul")
+
+  env = keys.reduce({}) do |e, key|
+    value = Diplomat::Kv.get(key)
+    if @opts[:dereference] && value && value[/^consul:\/\//]
+      reference_path = value.gsub(/^consul:\/\//, '')
+      value = Diplomat::Kv.get(reference_path)
+    end
+
+    e.merge(
+      key.gsub(prefix, '').upcase.gsub(/[^0-9a-z]/i, '_') => value
+    )
+  end
+
+  if cmd = @opts[:exec]
+
+    env = if @opts[:pristine]
+            env
+          else
+            ENV.to_h.merge(env)
+    end
+
+    exec(env, cmd, unsetenv_others: true)
+  else
+    env.each_pair do |k, v|
+      STDOUT.puts "#{@opts[:export] ? 'export ' : ''}#{k}=\"#{v}\""
+    end
+  end
+
 
   exit 0
 end

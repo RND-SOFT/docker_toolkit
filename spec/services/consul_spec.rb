@@ -71,9 +71,9 @@ RSpec.describe 'consul.rb' do
 
     describe 'manual envs load' do
       before do
-        Diplomat::Kv.put('services/env/service1/key-1', 'value1')
-        Diplomat::Kv.put('services/env/service1/key-2', 'value2')
-        Diplomat::Kv.put('services/env/service2/key-3', 'value3')
+        system("#{consul} --put services/env/service1/key-1:value1")
+        system("#{consul} --put services/env/service1/key-2:value2")
+        system("#{consul} --put services/env/service2/key-3:value3")
       end
 
       include_examples 'show env'
@@ -121,9 +121,9 @@ RSpec.describe 'consul.rb' do
 
       describe 'manual envs load' do
         before do
-          Diplomat::Kv.put('services/env/service1/key-1', 'value1')
-          Diplomat::Kv.put('services/env/service1/key-2', 'consul://services/env/service2/key_3')
-          Diplomat::Kv.put('services/env/service2/key_3', 'value3')
+          system("#{consul} --put services/env/service1/key-1:value1")
+          system("#{consul} --put services/env/service1/key-2:consul://services/env/service2/key_3")
+          system("#{consul} --put services/env/service2/key_3:value3")
         end
 
         include_examples 'show dereferencing env'
@@ -203,6 +203,26 @@ RSpec.describe 'consul.rb' do
         service = JSON.parse(json)['service1']
         expect(service[1]['env']).to eq('KEY_2')
         expect(service[1]['value']).to eq(content)
+      end
+    end
+
+    describe 'when execing' do
+      before do
+        system("#{consul} --put services/env/service1/key-1:value1")
+        system("#{consul} --put services/env/service1/key-2:value2")
+        system("#{consul} --put services/env/service2/key-3:value3")
+      end
+
+      it 'no pristine' do
+        result = `export SOMEENV=somevalue; #{consul} --env services/env/service1 -- env`
+        expect(result['SOMEENV=somevalue']).to be_truthy
+        expect(result['KEY_1=value1']).to be_truthy
+      end
+
+      it 'pristine' do
+        result = `export SOMEENV=somevalue; #{consul} --env services/env/service1 --pristine -- env`
+        expect(result['SOMEENV=somevalue']).to be_falsy
+        expect(result['KEY_1=value1']).to be_truthy
       end
     end
   end
