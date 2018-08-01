@@ -9,4 +9,4 @@ services:
 stage: test
 
 script:
-  - bundle exec rspec
+  - cd docker && ./run_tests.sh

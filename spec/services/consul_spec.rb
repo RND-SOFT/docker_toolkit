@@ -18,16 +18,18 @@ RSpec.describe 'consul.rb' do
   end
 
   around :each do |example|
-    system('consul agent -ui -server -bootstrap-expect=1 -bind 0.0.0.0 -client 0.0.0.0 -dev &> /dev/null &')
-    expect($CHILD_STATUS.success?).to be_truthy
-    system("#{waiter} --consul -t3 -i1 -q")
-    expect($CHILD_STATUS.success?).to be_truthy
+    begin
+      system('consul agent -ui -server -bootstrap-expect=1 -bind 0.0.0.0 -client 0.0.0.0 -dev &> /dev/null &')
+      expect($CHILD_STATUS.success?).to be_truthy
+      system("#{waiter} --consul -t3 -i1 -q")
+      expect($CHILD_STATUS.success?).to be_truthy
 
-    example.run
-  ensure
-    # system("consul leave &> /dev/null")
-    system('killall consul &> /dev/null')
-    expect($CHILD_STATUS.success?).to be_truthy
+      example.run
+    ensure
+      # system("consul leave &> /dev/null")
+      system('killall consul &> /dev/null')
+      expect($CHILD_STATUS.success?).to be_truthy
+    end
   end
 
   it 'consul is ready' do

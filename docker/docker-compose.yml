@@ -6,7 +6,7 @@ services:
       dockerfile: docker/Dockerfile
     image: docker_tools_tests:latest
     working_dir: /home/app
-    command: rspec
+    command: ["tail", "-f", "/dev/null"]
     
 
 
