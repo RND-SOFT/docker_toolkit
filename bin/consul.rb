@@ -181,7 +181,13 @@ if path = @opts[:get]
 end
 
 if prefix = @opts[:env]
-  keys = Diplomat::Kv.get(prefix, keys: true) || die("Can't get keys at #{prefix} from Consul")
+  keys = begin
+    Diplomat::Kv.get(prefix, keys: true)
+  rescue Diplomat::KeyNotFound => e
+    []
+  rescue StandardError
+    die("Can't get keys at #{prefix} from Consul")
+  end
 
   env = keys.reduce({}) do |e, key|
     value = Diplomat::Kv.get(key)
