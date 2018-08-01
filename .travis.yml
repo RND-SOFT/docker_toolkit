@@ -2,7 +2,11 @@ language: ruby
 rvm:
   - 2.1
   - 2.5
-
+  
+services:
+  - docker
+  
 stage: test
+
 script:
   - bundle exec rspec
