@@ -1,0 +1,12 @@
+version: "2"
+services:
+  tests:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    image: docker_tools_tests:latest
+    working_dir: /home/app
+    command: rspec
+    
+
+

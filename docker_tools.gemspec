@@ -12,19 +12,20 @@ Gem::Specification.new do |spec|
   spec.summary       = 'Helper classes for work with docker and consul'
   spec.description   = 'Helper classes for work with docker and consul'
 
-  spec.files         = `git ls-files -z`.split("\x0").reject do |f|
-    f.match(%r{^(test|spec|features)/})
-  end
   spec.bindir        = 'bin'
-  spec.executables   = `git ls-files -- bin/*`.split("\n").map{|f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  # spec.add_dependency 'activesupport'
-  # spec.add_dependency 'bigdecimal'
-  # spec.add_dependency 'bunny'
-  spec.add_dependency 'json'
-  # spec.add_dependency 'openssl'
+  if File.exist?(File.join(__dir__, '/', '.git'))
+    spec.files = `git ls-files -z`.split("\x0").reject do |f|
+      f.match(%r{^(test|spec|features)/})
+    end
+
+    spec.executables = `git ls-files -- bin/*`.split("\n").map{|f| File.basename(f) }
+  end
+
+
   spec.add_dependency 'diplomat'
+  spec.add_dependency 'json'
 
   spec.add_development_dependency 'bundler', '~> 1.14'
   spec.add_development_dependency 'rake', '~> 10.0'
