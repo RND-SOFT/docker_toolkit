@@ -7,10 +7,11 @@ Gem::Specification.new do |spec|
   spec.version       = DockerTools::VERSION
   spec.authors       = ['Godko Ivan', 'Samoilenko Yuri']
   spec.email         = ['igodko@rnds.pro', 'kinnalru@gmail.com']
+  spec.homepage      = 'https://github.com/RnD-Soft/docker_tools'
   spec.required_ruby_version = '>= 2.1.0'
 
-  spec.summary       = 'Helper classes for work with docker and consul'
-  spec.description   = 'Helper classes for work with docker and consul'
+  spec.summary       = 'Helper scripts for work with docker and consul'
+  spec.description   = 'Advanced docker and consul control scripts'
 
   spec.bindir        = 'bin'
   spec.require_paths = ['lib']
