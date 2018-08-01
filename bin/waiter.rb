@@ -24,7 +24,7 @@ INTERVAL = 3
 
 
 OptionParser.new do |o|
-  o.banner = 'Usage: waiter.rb [options]'
+  o.banner = 'Usage: waiter.rb [options] -- exec'
 
   o.on('--tcp host:port', 'Wait for tcp accepts on host:port') do |addr|
     host, port = addr.split(':')
@@ -57,15 +57,15 @@ OptionParser.new do |o|
     @opts[:pass] = pass.strip
   end
 
-  o.on('-t --timeout secs=15', 'Total timeout') do |timeout|
+  o.on('-t', '--timeout secs=15', 'Total timeout') do |timeout|
     @opts[:timeout] = timeout.to_i
   end
 
-  o.on('-i --interval secs=2', 'Interval between attempts') do |interval|
+  o.on('-i', '--interval secs=2', 'Interval between attempts') do |interval|
     @opts[:interval] = interval.to_i
   end
 
-  o.on('-q --quiet', ' Do not output any status messages') do
+  o.on('-q', '--quiet', 'Do not output any status messages') do
     @opts[:quiet] = true
   end
 end.parse!
