@@ -117,6 +117,7 @@ if @opts[:init]
   end
 
   services.each_pair do |service, config|
+    next unless config
     next if service[/^\./] # skip hidden keys
 
     path = "services/env/#{service}"
@@ -135,7 +136,7 @@ if @opts[:init]
         true
       end
 
-      Diplomat::Kv.put(key, (value || '').strip) || die("Can't put #{key} to Consul") if empty || @opts[:override]
+      Diplomat::Kv.put(key, value.to_s.strip) || die("Can't put #{key} to Consul") if empty || @opts[:override]
     end
   end
 
@@ -175,7 +176,7 @@ if put = @opts[:put]
   value = value.join(':')
   value = File.read(value) if @opts[:upload] && value && File.exist?(value)
 
-  Diplomat::Kv.put(path, (value || '').strip) || die("Can't put #{path} to Consul")
+  Diplomat::Kv.put(path, value.to_s.strip) || die("Can't put #{path} to Consul")
 
   exit 0
 end
@@ -183,7 +184,7 @@ end
 if path = @opts[:get]
   value = dereferenced_value(Diplomat::Kv.get(path))
 
-  STDOUT.puts (value || '').strip
+  STDOUT.puts value.to_s.strip
 
   exit 0
 end
