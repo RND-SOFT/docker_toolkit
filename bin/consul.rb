@@ -84,12 +84,25 @@ def die(message)
   exit 1
 end
 
+def key_to_consul(key)
+  key.downcase.gsub(/[^0-9a-z]/i, '_')
+end
+
+def key_to_env(key)
+  key.upcase.gsub(/[^0-9a-z]/i, '_')
+end
+
+def dereferenced_value(value)
+  if @opts[:dereference] && value && value[/^consul:\/\//]
+    reference_path = value.gsub(/^consul:\/\//, '')
+    dereferenced_value(Diplomat::Kv.get(reference_path))
+  else
+    value
+  end
+end
+
 if config = @opts[:config]
-  @opts[:config] = if config == '-'
-                     JSON.parse(STDIN.read)
-                   else
-                     JSON.parse(File.read(config))
-                   end
+  @opts[:config] = YAML.safe_load(config == '-' ? STDIN.read : File.read(config), [], [], true)
 end
 
 if @opts[:init]
@@ -104,10 +117,11 @@ if @opts[:init]
   end
 
   services.each_pair do |service, config|
+    next if service[/^\./] # skip hidden keys
+
     path = "services/env/#{service}"
-    config.each do |item|
-      env = item['env'].downcase.gsub(/[^0-9a-z]/i, '_')
-      key = "#{path}/#{env}"
+    config.each_pair do |env, item|
+      key = "#{path}/#{key_to_consul(env)}"
       value = if @opts[:upload] && item['file']
                 File.read(item['file'])
               else
@@ -139,21 +153,19 @@ if @opts[:show]
 
   answer = Diplomat::Kv.get(path, recurse: true, convert_to_hash: true) || die("Can't get #{path} from Consul")
   answer['services']['env'].each_pair do |service, env|
-    cfg = config[service] ||= []
+    cfg = config[service] ||= {}
 
     env.each_pair do |key, value|
-      if @opts[:dereference] && value && value[/^consul:\/\//]
-        reference_path = value.gsub(/^consul:\/\//, '')
-        value = Diplomat::Kv.get(reference_path)
-      end
-      cfg.push(
-        env: key.upcase.gsub(/[^0-9a-z]/i, '_'),
+      value = dereferenced_value(value)
+
+      cfg[key_to_env(key)] = {
+        env: key_to_env(key),
         value: value
-      )
+      }
     end
   end
 
-  STDOUT.puts JSON.pretty_generate(config)
+  STDOUT.puts JSON.parse(config.to_json).to_yaml
 
   exit 0
 end
@@ -169,11 +181,7 @@ if put = @opts[:put]
 end
 
 if path = @opts[:get]
-  value = Diplomat::Kv.get(path)
-  if @opts[:dereference] && value && value[/^consul:\/\//]
-    reference_path = value.gsub(/^consul:\/\//, '')
-    value = Diplomat::Kv.get(reference_path)
-  end
+  value = dereferenced_value(Diplomat::Kv.get(path))
 
   STDOUT.puts (value || '').strip
 
@@ -190,24 +198,13 @@ if prefix = @opts[:env]
   end
 
   env = keys.reduce({}) do |e, key|
-    value = Diplomat::Kv.get(key)
-    if @opts[:dereference] && value && value[/^consul:\/\//]
-      reference_path = value.gsub(/^consul:\/\//, '')
-      value = Diplomat::Kv.get(reference_path)
-    end
+    value = dereferenced_value(Diplomat::Kv.get(key))
 
-    e.merge(
-      key.gsub(prefix, '').upcase.gsub(/[^0-9a-z]/i, '_') => value
-    )
+    e.merge(key_to_env(key.gsub(prefix, '')) => value)
   end
 
   if cmd = @opts[:exec]
-
-    env = if @opts[:pristine]
-            env
-          else
-            ENV.to_h.merge(env)
-    end
+    env = ENV.to_h.merge(env) unless @opts[:pristine]
 
     exec(env, cmd, unsetenv_others: true)
   else

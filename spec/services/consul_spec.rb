@@ -42,30 +42,33 @@ RSpec.describe 'consul.rb' do
       it 'show env for service1' do
         json = `#{consul} --show service1`
         expect($CHILD_STATUS.success?).to be_truthy
-        json = JSON.parse(json)
+        json = YAML.safe_load(json)
         expect(json).to include('service1')
         expect(json).not_to include('service2')
 
         service = json['service1']
         expect(service.count).to eq 2
-        expect(service[0]).to include('env' => 'KEY_1', 'value' => 'value1')
-        expect(service[1]).to include('env' => 'KEY_2', 'value' => 'value2')
+        expect(service).to include('KEY_1', 'KEY_2')
+        expect(service['KEY_1']).to include('env' => 'KEY_1', 'value' => 'value1')
+        expect(service['KEY_2']).to include('env' => 'KEY_2', 'value' => 'value2')
       end
 
       it 'show env for all services' do
         json = `#{consul} --show`
         expect($CHILD_STATUS.success?).to be_truthy
-        json = JSON.parse(json)
+        json = YAML.safe_load(json)
         expect(json).to include('service1', 'service2')
 
         service = json['service1']
         expect(service.count).to eq 2
-        expect(service[0]).to include('env' => 'KEY_1', 'value' => 'value1')
-        expect(service[1]).to include('env' => 'KEY_2', 'value' => 'value2')
+        expect(service).to include('KEY_1', 'KEY_2')
+        expect(service['KEY_1']).to include('env' => 'KEY_1', 'value' => 'value1')
+        expect(service['KEY_2']).to include('env' => 'KEY_2', 'value' => 'value2')
 
         service = json['service2']
         expect(service.count).to eq 1
-        expect(service[0]).to include('env' => 'KEY_3', 'value' => 'value3')
+        expect(service).to include('KEY_3')
+        expect(service['KEY_3']).to include('env' => 'KEY_3', 'value' => 'value3')
       end
     end
 
@@ -84,13 +87,13 @@ RSpec.describe 'consul.rb' do
         IO.popen("#{consul} --init --config -", 'r+') do |stdin|
           stdin.puts %(
             {
-              "service1": [
-                {"env": "KEY-1", "value": "value1"},
-                {"env": "KEY_2", "value": "value2"}
-              ],
-              "service2": [
-                {"env": "key-3", "value": "value3"}
-              ]
+              "service1": {
+                "KEY-1": {"value": "value1"},
+                "KEY_2": {"value": "value2"}
+              },
+              "service2": {
+                "key-3": {"value": "value3"}
+              }
             }
           )
           stdin.close
@@ -105,17 +108,17 @@ RSpec.describe 'consul.rb' do
         it 'is disabled' do
           json = `#{consul} --show service1`
           expect($CHILD_STATUS.success?).to be_truthy
-          service = JSON.parse(json)['service1']
-          expect(service[1]['env']).to eq('KEY_2')
-          expect(service[1]['value']).to eq('consul://services/env/service2/key_3')
+          service = YAML.safe_load(json)['service1']
+          expect(service['KEY_2']['env']).to eq('KEY_2')
+          expect(service['KEY_2']['value']).to eq('consul://services/env/service2/key_3')
         end
 
         it 'is enabled' do
           json = `#{consul} --show service1 -d`
           expect($CHILD_STATUS.success?).to be_truthy
-          service = JSON.parse(json)['service1']
-          expect(service[1]['env']).to eq('KEY_2')
-          expect(service[1]['value']).to eq('value3')
+          service = YAML.safe_load(json)['service1']
+          expect(service['KEY_2']['env']).to eq('KEY_2')
+          expect(service['KEY_2']['value']).to eq('value3')
         end
       end
 
@@ -134,13 +137,13 @@ RSpec.describe 'consul.rb' do
           IO.popen("#{consul} --init --config -", 'r+') do |stdin|
             stdin.puts %(
               {
-                "service1": [
-                  {"env": "KEY-1", "value": "value1"},
-                  {"env": "KEY_2", "value": "consul://services/env/service2/key_3"}
-                ],
-                "service2": [
-                  {"env": "key-3", "value": "value3"}
-                ]
+                "service1": {
+                  "KEY-1": {"value": "value1"},
+                  "KEY_2": {"value": "consul://services/env/service2/key_3"}
+                },
+                "service2": {
+                  "key-3": {"value": "value3"}
+                }
               }
             )
             stdin.close
@@ -163,13 +166,13 @@ RSpec.describe 'consul.rb' do
         IO.popen("#{consul} --init --config -", 'r+') do |stdin|
           stdin.puts %(
             {
-              "service1": [
-                {"env": "KEY-1", "value": "value1"},
-                {"env": "KEY_2", "file": "FILE"}
-              ],
-              "service2": [
-                {"env": "key-3", "value": "value3"}
-              ]
+              "service1": {
+                "KEY-1": {"value": "value1"},
+                "KEY_2": {"file": "FILE"}
+              },
+              "service2": {
+                "key-3": {"value": "value3"}
+              }
             }
           ).gsub('FILE', file)
           stdin.close
@@ -177,22 +180,22 @@ RSpec.describe 'consul.rb' do
 
         json = `#{consul} --show service1 -d`
         expect($CHILD_STATUS.success?).to be_truthy
-        service = JSON.parse(json)['service1']
-        expect(service[1]['env']).to eq('KEY_2')
-        expect(service[1]['value']).to eq(file)
+        service = YAML.safe_load(json)['service1']
+        expect(service['KEY_2']['env']).to eq('KEY_2')
+        expect(service['KEY_2']['value']).to eq(file)
       end
 
       it 'is enabled' do
         IO.popen("#{consul} --init --config - --upload", 'r+') do |stdin|
           stdin.puts %(
             {
-              "service1": [
-                {"env": "KEY-1", "value": "value1"},
-                {"env": "KEY_2", "file": "FILE"}
-              ],
-              "service2": [
-                {"env": "key-3", "value": "value3"}
-              ]
+              "service1": {
+                "KEY-1": {"value": "value1"},
+                "KEY_2": {"file": "FILE"}
+              },
+              "service2": {
+                "key-3": {"value": "value3"}
+              }
             }
           ).gsub('FILE', file)
           stdin.close
@@ -200,9 +203,9 @@ RSpec.describe 'consul.rb' do
 
         json = `#{consul} --show service1 -d`
         expect($CHILD_STATUS.success?).to be_truthy
-        service = JSON.parse(json)['service1']
-        expect(service[1]['env']).to eq('KEY_2')
-        expect(service[1]['value']).to eq(content)
+        service = YAML.safe_load(json)['service1']
+        expect(service['KEY_2']['env']).to eq('KEY_2')
+        expect(service['KEY_2']['value']).to eq(content)
       end
     end
 
