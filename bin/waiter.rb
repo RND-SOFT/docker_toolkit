@@ -21,6 +21,7 @@ INTERVAL = 3
                 end)
 @opts[:timeout] = TIMEOUT
 @opts[:interval] = INTERVAL
+@opts[:consul_addr] = 'http://localhost:8500'
 
 
 OptionParser.new do |o|
@@ -39,6 +40,10 @@ OptionParser.new do |o|
 
   o.on('--tb tablename', 'Wait for PG table exists. Using --tcp to conenct PG') do |tb|
     @opts[:tb] = tb.strip
+  end
+
+  o.on("--consul-addr addr=#{@opts[:consul_addr]}", 'HTTP addres to connect to consul') do |addr|
+    @opts[:consul_addr] = addr.strip
   end
 
   o.on('--consul', 'Wait for local consul agent to be ready') do
@@ -123,7 +128,7 @@ end
 def wait_for_consul
   log('Waiting for consul...')
   ret = wait_for @opts[:timeout] do
-    cmd = 'consul operator raft list-peers > /dev/null 2>&1'
+    cmd = "consul operator raft list-peers -http-addr=#{@opts[:consul_addr]} > /dev/null 2>&1"
     system(cmd)
     $CHILD_STATUS.success?
   end
@@ -134,7 +139,7 @@ end
 def wait_for_consul_service(service)
   log("Waiting for consul service #{service}...")
   ret = wait_for @opts[:timeout] do
-    cmd = "curl -s http://localhost:8500/v1/health/service/#{service}?passing | wc -c"
+    cmd = "curl -s #{@opts[:consul_addr]}/v1/health/service/#{service}?passing | wc -c"
     bytes = `#{cmd}`.to_i
     bytes > 10
   end
