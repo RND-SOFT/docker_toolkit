@@ -2,6 +2,7 @@ require 'tmpdir'
 require 'socket'
 require 'English'
 require 'securerandom'
+require 'tempfile'
 
 RSpec.describe 'waiter.rb' do
   let(:waiter){ File.join($root, '../', 'bin', 'waiter.rb') }
@@ -67,4 +68,21 @@ RSpec.describe 'waiter.rb' do
       expect(File.read(result_file).strip).to eq content
     end
   end
+
+  context 'File' do
+
+    it 'wait for file success' do
+      file = Tempfile.new
+      system("#{waiter_cmd} -f #{file.path}")
+      expect($CHILD_STATUS.success?).to be_truthy
+      file.unlink
+    end
+
+    it 'wait for file timeout' do
+      system("#{waiter_cmd} --file #{SecureRandom.hex}")
+      expect($CHILD_STATUS.success?).to be_falsey
+    end
+
+  end
+
 end

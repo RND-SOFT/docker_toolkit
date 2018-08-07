@@ -42,6 +42,10 @@ OptionParser.new do |o|
     @opts[:tb] = tb.strip
   end
 
+  o.on('-f', '--file filename', 'Wait for file exists.') do |file|
+    @opts[:file] = file.strip
+  end
+
   o.on("--consul-addr addr=#{@opts[:consul_addr]}", 'HTTP addres to connect to consul') do |addr|
     @opts[:consul_addr] = addr.strip
   end
@@ -180,6 +184,14 @@ def wait_for_tb
   yield(ret)
 end
 
+def wait_for_file file=@opts[:file], timeout=@opts[:timeout]
+  log("Waiting for FILE: #{file}")
+  ret = wait_for timeout do
+    File.exists? file
+  end
+  yield(ret)
+end
+
 if @opts[:tb]
   wait_for_tcp do |success|
     if success
@@ -223,6 +235,12 @@ end
 
 if @opts[:tcp]
   wait_for_tcp do |success|
+    complete!(success)
+  end
+end
+
+if @opts[:file]
+  wait_for_file(@opts[:file], @opts[:timeout]) do |success|
     complete!(success)
   end
 end
