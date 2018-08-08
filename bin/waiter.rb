@@ -184,10 +184,10 @@ def wait_for_tb
   yield(ret)
 end
 
-def wait_for_file file=@opts[:file], timeout=@opts[:timeout]
+def wait_for_file(file = @opts[:file], timeout = @opts[:timeout])
   log("Waiting for FILE: #{file}")
   ret = wait_for timeout do
-    File.exists? file
+    File.exist? file
   end
   yield(ret)
 end

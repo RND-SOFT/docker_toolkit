@@ -70,7 +70,6 @@ RSpec.describe 'waiter.rb' do
   end
 
   context 'File' do
-
     it 'wait for file success' do
       file = Tempfile.new
       system("#{waiter_cmd} -f #{file.path}")
@@ -82,7 +81,5 @@ RSpec.describe 'waiter.rb' do
       system("#{waiter_cmd} --file #{SecureRandom.hex}")
       expect($CHILD_STATUS.success?).to be_falsey
     end
-
   end
-
 end
