@@ -3,7 +3,7 @@
 require 'English'
 require 'yaml'
 
-if $PROGRAM_NAME == __FILE__
+if File.basename($PROGRAM_NAME) == File.basename(__FILE__)
   unless ENV['COMPOSE_FILE']
     STDERR.puts 'COMPOSE_FILE environment must point to one on mo files'
     exit 1
@@ -62,7 +62,7 @@ def extend_hash(first, second)
   first
 end
 
-def process_compose_hash(yml, parent = {})
+def process_compose_hash(yml, dirname, parent = {})
   (yml['services'] || {}).each_pair do |name, service|
     next unless ext = service['extends']
     base = if ext.is_a? String
@@ -75,7 +75,12 @@ def process_compose_hash(yml, parent = {})
                file.gsub!("${#{k}}", v)
              end
 
-             tmp = YAML.safe_load(File.read(file))
+             tmp = if File.exist?(dirname + '/' + file)
+                     YAML.safe_load(File.read(dirname + '/' + file))
+                   else
+                     YAML.safe_load(File.read(file))
+             end
+
              begin
                  (tmp['services'][ext['service']] || {})
                rescue StandardError
@@ -92,17 +97,13 @@ def process_compose_hash(yml, parent = {})
   yml
 end
 
-if $PROGRAM_NAME == __FILE__
-
+if File.basename($PROGRAM_NAME) == File.basename(__FILE__)
   result = ENV['COMPOSE_FILE'].split(':').reduce({}) do |parent, file|
-    yml = process_compose_hash(YAML.safe_load(File.read(file)), parent)
-
+    yml = process_compose_hash(YAML.safe_load(File.read(file)), File.dirname(file), parent)
     if yml['version'] && parent['version'] && yml['version'] != parent['version']
       raise "version mismatch: #{file}"
     end
-
     ret = extend_hash(parent.deep_dup, yml)
-
     ret
   end
 
