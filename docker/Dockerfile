@@ -46,6 +46,9 @@ RUN set -ex \
   
 ADD . /home/app
 
+RUN set -ex \
+  && gem build `ls | grep gemspec` \
+  && gem install `ls | grep -e '.gem$'`
 
 
 SHELL ["/bin/sh", "-c", "-l"]

@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-require "childprocess"
 require 'English'
 
 module DockerToolkit
@@ -49,6 +48,17 @@ class Watcher
       end
     end
 
+    @procs.each do |meta|
+      meta[:stdout].close rescue nil
+      meta[:stderr].close rescue nil
+    end
+
+    Thread.new do 
+      sleep 2
+      @threads.each(&:terminate)
+    end
+    
+
   end
 
 
@@ -61,12 +71,30 @@ class Watcher
     process.io.stdout = wout
     process.io.stderr = werr
 
-    @procs.push(
+    meta = {
       cmd: cmd,
       process: process,
       stdout: rout,
       stderr: rerr
-    )
+    }
+
+    @threads << Thread.new(meta[:stdout], STDOUT) do |io, out|
+      loop do
+        break unless synchro_readline(io, out)
+      end
+    end
+
+    @threads << Thread.new(meta[:stderr], STDERR) do |io, out|
+      loop do
+        break unless synchro_readline(io, out)
+      end
+    end
+
+    log "Starting #{meta[:cmd]}"
+    meta[:pid] = meta[:process].start.pid
+
+    @procs.push(meta)
+    meta
   end
 
   def synchro_readline io, out
@@ -86,7 +114,7 @@ class Watcher
   end
 
 
-  def exec 
+  def exec &block
     %w[EXIT QUIT].each do |sig|
       trap(sig) do
         stop_all
@@ -96,10 +124,8 @@ class Watcher
 
     %w[INT TERM].each do |sig|
       trap(sig) do
-        with_tab do 
-          log "Catch #{sig}: try exits gracefully.."
-          stop_all
-        end
+        log "Catch #{sig}: try exits gracefully.."
+        stop_all
       end
     end 
 
@@ -133,34 +159,19 @@ class Watcher
       end 
     end
 
-    @procs.each do |meta|
-      @threads << Thread.new(meta[:stdout], STDOUT) do |io, out|
-        loop do
-          break unless synchro_readline(io, out)
-        end
-      end
-
-      @threads << Thread.new(meta[:stderr], STDERR) do |io, out|
-        loop do
-          break unless synchro_readline(io, out)
-        end
-      end
-
-      meta[:pid] = meta[:process].start.pid
-    end
-
     begin
-      yield if block_given?
+      yield(self)
     rescue => e
       @crashed = true
       @code = 1
       error e.inspect
+      error e.backtrace.last(20).join("\n")
       log "Try exits gracefully.."
       stop_all
     end
 
     @threads.map(&:join)
-
+    
     if @crashed
       @code = [@code || 0, 1].max
     end

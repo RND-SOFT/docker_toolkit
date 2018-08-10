@@ -1,6 +1,4 @@
 #!/usr/bin/env ruby
-
-require "childprocess"
 require 'optparse'
 require 'English'
 
@@ -50,9 +48,9 @@ end
   end
 end 
 
+sleep @opts[:sleep]
+
 ::Process.kill('KILL', $$) if @opts[:kill]
 ::Process.kill('TERM', $$) if @opts[:term]
 
-
-sleep @opts[:sleep]
 exit @opts[:code]

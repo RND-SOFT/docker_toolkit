@@ -5,6 +5,7 @@ require 'docker_toolkit/version'
 Gem::Specification.new do |spec|
   spec.name          = 'docker_toolkit'
   spec.version       = DockerToolkit::VERSION
+  spec.license       = 'MIT'
   spec.authors       = ['Godko Ivan', 'Samoilenko Yuri']
   spec.email         = ['igodko@rnds.pro', 'kinnalru@gmail.com']
   spec.homepage      = 'https://github.com/RnD-Soft/docker_toolkit'
