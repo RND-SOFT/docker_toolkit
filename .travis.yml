@@ -1,6 +1,6 @@
 language: ruby
 rvm:
-  - 2.1
+  - 2.0
   - 2.5
   
 services:
@@ -14,7 +14,7 @@ script:
 jobs:
   include:
     - stage: gem release
-      rvm: 2.5
+      rvm: 2.0
       script: echo "Deploying to rubygems.org ..."
       deploy:
         provider: rubygems

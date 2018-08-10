@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Godko Ivan', 'Samoilenko Yuri']
   spec.email         = ['igodko@rnds.pro', 'kinnalru@gmail.com']
   spec.homepage      = 'https://github.com/RnD-Soft/docker_toolkit'
-  spec.required_ruby_version = '>= 2.1.0'
+  spec.required_ruby_version = '>= 2.0.0'
 
   spec.summary       = 'Helper scripts for work with docker and consul'
   spec.description   = 'Advanced docker and consul control scripts'
