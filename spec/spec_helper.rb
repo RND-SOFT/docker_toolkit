@@ -18,7 +18,6 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 require 'rspec/retry'
-require 'faker'
 
 $root = File.join(File.dirname(__dir__), 'spec')
 Dir[File.join(__dir__, 'support', '**', '*.rb')].sort.each {|f| require f }
