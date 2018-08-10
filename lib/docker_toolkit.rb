@@ -2,9 +2,9 @@ require 'diplomat'
 require 'English'
 require 'optparse'
 
-require 'docker_tools/version'
+require 'docker_toolkit/version'
 
-module DockerTools
+module DockerToolkit
 
 
 end

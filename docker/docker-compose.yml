@@ -4,7 +4,7 @@ services:
     build:
       context: ../
       dockerfile: docker/Dockerfile
-    image: docker_tools_tests:latest
+    image: docker_toolkit_tests:latest
     working_dir: /home/app
     command: ["tail", "-f", "/dev/null"]
     

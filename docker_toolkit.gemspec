@@ -1,13 +1,13 @@
 lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'docker_tools/version'
+require 'docker_toolkit/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'docker_tools'
-  spec.version       = DockerTools::VERSION
+  spec.name          = 'docker_toolkit'
+  spec.version       = DockerToolkit::VERSION
   spec.authors       = ['Godko Ivan', 'Samoilenko Yuri']
   spec.email         = ['igodko@rnds.pro', 'kinnalru@gmail.com']
-  spec.homepage      = 'https://github.com/RnD-Soft/docker_tools'
+  spec.homepage      = 'https://github.com/RnD-Soft/docker_toolkit'
   spec.required_ruby_version = '>= 2.1.0'
 
   spec.summary       = 'Helper scripts for work with docker and consul'

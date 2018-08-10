@@ -36,7 +36,7 @@ RUN set -ex \
   && mv envconsul /bin/envconsul \
   && chmod +x /bin/envconsul
 
-ADD Gemfile Gemfile.lock docker_tools.gemspec /home/app/
+ADD Gemfile Gemfile.lock docker_toolkit.gemspec /home/app/
 ADD lib/ /home/app/lib
 
 RUN set -ex \
