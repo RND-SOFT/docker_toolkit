@@ -19,7 +19,7 @@ RSpec.describe 'consul.rb' do
 
   around :each do |example|
     begin
-      system('consul agent -ui -server -bootstrap-expect=1 -bind 0.0.0.0 -client 0.0.0.0 -dev &> /dev/null &')
+      system('consul agent -ui -server -bootstrap-expect=1 -bind 127.0.0.1 -client 127.0.0.0 -dev &> /dev/null &')
       expect($CHILD_STATUS.success?).to be_truthy
       system("#{waiter} --consul -t3 -i1 -q")
       expect($CHILD_STATUS.success?).to be_truthy
