@@ -12,6 +12,8 @@ stage: test
 script:
   - gem build `ls | grep gemspec`
   - gem install `ls | grep -e '.gem$'`
+  - curl -sSLo /tmp/consul.zip https://releases.hashicorp.com/consul/1.2.1/consul_1.2.1_linux_amd64.zip 
+  - unzip -d /bin /tmp/consul.zip 
   - bundle exec rspec
 
 
