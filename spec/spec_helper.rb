@@ -17,13 +17,13 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
-require 'rspec/retry'
+#require 'rspec/retry'
 
 $root = File.join(File.dirname(__dir__), 'spec')
 Dir[File.join(__dir__, 'support', '**', '*.rb')].sort.each {|f| require f }
 
 RSpec.configure do |config|
-  config.verbose_retry = true
+  #config.verbose_retry = true
   # Try twice (retry once)
   # config.default_retry_count = 2
 
