@@ -10,7 +10,10 @@ services:
 stage: test
 
 script:
-  - cd docker && ./run_tests.sh
+  - gem build `ls | grep gemspec`
+  - gem install `ls | grep -e '.gem$'`
+  - rspec
+
 
 jobs:
   include:
