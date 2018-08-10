@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    docker_tools (0.1.0)
+    docker_toolkit (0.1.0)
       diplomat
       json
 
@@ -47,7 +47,7 @@ PLATFORMS
 DEPENDENCIES
   awesome_print
   bundler (~> 1.14)
-  docker_tools!
+  docker_toolkit!
   faker
   faker-russian
   rake (~> 10.0)
