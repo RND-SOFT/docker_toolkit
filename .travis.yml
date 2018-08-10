@@ -11,9 +11,14 @@ stage: test
 script:
   - cd docker && ./run_tests.sh
 
-deploy:
-  provider: rubygems
-  api_key: $RUBYGEMS_KEY
-  gemspec: docker_toolkit.gemspec
+jobs:
+  include:
+    - stage: gem release
+      rvm: 2.5
+      script: echo "Deploying to rubygems.org ..."
+      deploy:
+        provider: rubygems
+        api_key: $RUBYGEMS_KEY
+        gemspec: docker_toolkit.gemspec
 
 
