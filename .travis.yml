@@ -4,9 +4,6 @@ rvm:
   - 2.0
   - 2.5
   
-services:
-  - docker
-  
 stage: test
 
 before_install:

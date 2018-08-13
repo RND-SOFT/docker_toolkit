@@ -1,4 +1,4 @@
-FROM mayok/alpine-ruby
+FROM ruby:2.5.0-alpine
 MAINTAINER Firmhouse "kinnalru@gmail.com"
 
 WORKDIR /home/app

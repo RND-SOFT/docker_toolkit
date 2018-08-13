@@ -12,6 +12,7 @@ RSpec.describe DockerToolkit::Watcher do
         it "example #{name} with exit code #{exit_code}" do
           system("#{file}")
           status = $CHILD_STATUS
+          puts status.inspect
           expect(status.exitstatus).to eq exit_code.to_i
         end
       end
