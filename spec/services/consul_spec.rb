@@ -21,13 +21,14 @@ RSpec.describe 'consul.rb' do
     begin
       system('consul agent -ui -server -bootstrap-expect=1 -bind 127.0.0.1 -client 127.0.0.1 -dev &> /dev/null &')
       expect($CHILD_STATUS.success?).to be_truthy
-      system("#{waiter} --consul -t3 -i1 -q")
+      system("#{waiter} --consul -t10 -i2 -q")
       expect($CHILD_STATUS.success?).to be_truthy
 
       example.run
     ensure
       # system("consul leave &> /dev/null")
       system('killall consul &> /dev/null')
+      sleep 2
       expect($CHILD_STATUS.success?).to be_truthy
     end
   end

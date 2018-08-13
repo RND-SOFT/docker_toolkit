@@ -10,7 +10,7 @@ RSpec.describe DockerToolkit::Watcher do
         name, exit_code = File.basename(file, '.rb').split('_')
 
         it "example #{name} with exit code #{exit_code}" do
-          system("#{file} &> /dev/null")
+          system("#{file}")
           status = $CHILD_STATUS
           expect(status.exitstatus).to eq exit_code.to_i
         end
