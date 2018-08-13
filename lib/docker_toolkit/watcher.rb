@@ -25,6 +25,11 @@ module DockerToolkit
       end
 
       terminating.each do |meta|
+        begin
+          meta[:stdin].close
+        rescue StandardError
+          nil
+        end
         ::Process.kill 'TERM', meta[:process].pid
       end
 
@@ -77,12 +82,14 @@ module DockerToolkit
 
       process.io.stdout = wout
       process.io.stderr = werr
+      process.duplex = true
 
       meta = {
         cmd: cmd,
         process: process,
         stdout: rout,
-        stderr: rerr
+        stderr: rerr,
+        stdin: process.io.stdin
       }
 
       @threads << Thread.new(meta[:stdout], STDOUT) do |io, out|
@@ -148,15 +155,20 @@ module DockerToolkit
 
           meta[:handled] = true
           begin
-          meta[:stdout].close
-        rescue StandardError
-          IOError
-        end
+            meta[:stdin].close
+          rescue StandardError
+            nil
+          end
           begin
-          meta[:stderr].close
-        rescue StandardError
-          IOError
-        end
+            meta[:stdout].close
+          rescue StandardError
+            nil
+          end
+          begin
+            meta[:stderr].close
+          rescue StandardError
+            nil
+          end
 
           if !@crashed && meta[:process].crashed?
             @crashed = true

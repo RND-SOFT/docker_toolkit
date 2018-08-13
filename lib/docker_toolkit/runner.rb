@@ -14,7 +14,7 @@ module DockerToolkit
     end
 
     def load_envs(string, env = ENV)
-      envs Dotenv::Parser.new(string).call
+      envs = Dotenv::Parser.new(string).call
       envs.each_pair do |k, v|
         env[k] = v
       end
@@ -22,6 +22,7 @@ module DockerToolkit
     end
 
     def execute(cmd)
+      puts "Executing: #{cmd}"
       `#{cmd}`
     end
 
