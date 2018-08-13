@@ -11,6 +11,13 @@ STDERR.sync = true
   term_code: 0
 }
 
+def log(msg)
+  puts "[terminator]: #{msg}"
+end
+
+log "started: #{ARGV.inspect}"
+
+
 parser = OptionParser.new do |o|
   o.banner = 'Usage: term.rb [options]'
 
@@ -33,24 +40,32 @@ parser = OptionParser.new do |o|
   o.on('--kill', 'SIGKILL self') do
     @opts[:kill] = true
   end
-
 end
 parser.parse!
 
-def log msg
-  puts "[terminator]: #{msg}"
-end
+
 
 
 %w[INT TERM].each do |sig|
   trap(sig) do
+    log "signal: #{sig}. exit: #{@opts[:term_code]}"
     exit(@opts[:term_code])
   end
-end 
+end
 
+log 'sleep...'
 sleep @opts[:sleep]
 
-::Process.kill('KILL', $$) if @opts[:kill]
-::Process.kill('TERM', $$) if @opts[:term]
+log 'go'
+if @opts[:kill]
+  log 'kill self'
+  ::Process.kill('KILL', $PROCESS_ID)
+end
 
+if @opts[:term]
+  log 'term self'
+  ::Process.kill('TERM', $PROCESS_ID)
+end
+
+log "normal exit with: #{@opts[:code]}"
 exit @opts[:code]

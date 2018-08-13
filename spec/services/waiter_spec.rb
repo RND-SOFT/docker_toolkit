@@ -26,7 +26,7 @@ RSpec.describe 'waiter.rb' do
         break if terminate
         client = begin
           server.accept_nonblock
-        rescue IO::EAGAINWaitReadable
+        rescue StandardError
           sleep 1
           nil
         end
@@ -71,7 +71,7 @@ RSpec.describe 'waiter.rb' do
 
   context 'File' do
     it 'wait for file success' do
-      file = Tempfile.new
+      file = Tempfile.new('file')
       system("#{waiter_cmd} -f #{file.path}")
       expect($CHILD_STATUS.success?).to be_truthy
       file.unlink

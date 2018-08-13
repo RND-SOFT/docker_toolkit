@@ -76,9 +76,9 @@ def process_compose_hash(yml, dirname, parent = {})
              end
 
              tmp = if File.exist?(dirname + '/' + file)
-                     YAML.safe_load(File.read(dirname + '/' + file))
+                     YAML.load(File.read(dirname + '/' + file))
                    else
-                     YAML.safe_load(File.read(file))
+                     YAML.load(File.read(file))
              end
 
              begin
@@ -99,7 +99,7 @@ end
 
 if File.basename($PROGRAM_NAME) == File.basename(__FILE__)
   result = ENV['COMPOSE_FILE'].split(':').reduce({}) do |parent, file|
-    yml = process_compose_hash(YAML.safe_load(File.read(file)), File.dirname(file), parent)
+    yml = process_compose_hash(YAML.load(File.read(file)), File.dirname(file), parent)
     if yml['version'] && parent['version'] && yml['version'] != parent['version']
       raise "version mismatch: #{file}"
     end

@@ -3,6 +3,9 @@ AllCops:
   Exclude:
     - 'storage/**/*'
     - 'docker/**/*'
+    - 'lib/childprocess/**/*'
+    - 'lib/childprocess,rb'
+    
 
 Style/AsciiComments:
   Enabled: false

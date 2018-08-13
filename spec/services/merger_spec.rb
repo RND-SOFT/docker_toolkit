@@ -38,8 +38,8 @@ RSpec.describe 'merger.rb' do
         Dir.chdir File.join($root, 'fixtures') do
           result_yml = `COMPOSE_FILE=template#{num}.yml #{merger}`.strip
           expected_yml = File.read("result#{num}.yml").strip
-          result = YAML.safe_load(result_yml)
-          expected = YAML.safe_load(expected_yml)
+          result = YAML.load(result_yml)
+          expected = YAML.load(expected_yml)
 
           expect(result).to eq expected
         end

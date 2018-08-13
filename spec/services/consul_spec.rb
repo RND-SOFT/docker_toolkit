@@ -42,7 +42,7 @@ RSpec.describe 'consul.rb' do
       it 'show env for service1' do
         json = `#{consul} --show service1`
         expect($CHILD_STATUS.success?).to be_truthy
-        json = YAML.safe_load(json)
+        json = YAML.load(json)
         expect(json).to include('service1')
         expect(json).not_to include('service2')
 
@@ -56,7 +56,7 @@ RSpec.describe 'consul.rb' do
       it 'show env for all services' do
         json = `#{consul} --show`
         expect($CHILD_STATUS.success?).to be_truthy
-        json = YAML.safe_load(json)
+        json = YAML.load(json)
         expect(json).to include('service1', 'service2')
 
         service = json['service1']
@@ -108,7 +108,7 @@ RSpec.describe 'consul.rb' do
         it 'is disabled' do
           json = `#{consul} --show service1`
           expect($CHILD_STATUS.success?).to be_truthy
-          service = YAML.safe_load(json)['service1']
+          service = YAML.load(json)['service1']
           expect(service['KEY_2']['env']).to eq('KEY_2')
           expect(service['KEY_2']['value']).to eq('consul://services/env/service2/key_3')
         end
@@ -116,7 +116,7 @@ RSpec.describe 'consul.rb' do
         it 'is enabled' do
           json = `#{consul} --show service1 -d`
           expect($CHILD_STATUS.success?).to be_truthy
-          service = YAML.safe_load(json)['service1']
+          service = YAML.load(json)['service1']
           expect(service['KEY_2']['env']).to eq('KEY_2')
           expect(service['KEY_2']['value']).to eq('value3')
         end
@@ -180,7 +180,7 @@ RSpec.describe 'consul.rb' do
 
         json = `#{consul} --show service1 -d`
         expect($CHILD_STATUS.success?).to be_truthy
-        service = YAML.safe_load(json)['service1']
+        service = YAML.load(json)['service1']
         expect(service['KEY_2']['env']).to eq('KEY_2')
         expect(service['KEY_2']['value']).to eq(file)
       end
@@ -203,7 +203,7 @@ RSpec.describe 'consul.rb' do
 
         json = `#{consul} --show service1 -d`
         expect($CHILD_STATUS.success?).to be_truthy
-        service = YAML.safe_load(json)['service1']
+        service = YAML.load(json)['service1']
         expect(service['KEY_2']['env']).to eq('KEY_2')
         expect(service['KEY_2']['value']).to eq(content)
       end

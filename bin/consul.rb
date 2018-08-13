@@ -102,7 +102,7 @@ def dereferenced_value(value)
 end
 
 if config = @opts[:config]
-  @opts[:config] = YAML.safe_load(config == '-' ? STDIN.read : File.read(config), [], [], true)
+  @opts[:config] = YAML.load(config == '-' ? STDIN.read : File.read(config))
 end
 
 if @opts[:init]
