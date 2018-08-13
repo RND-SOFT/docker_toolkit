@@ -16,6 +16,4 @@ DockerToolkit::Watcher.new.exec do |w|
     puts `ls /tmp/no_such_file &> /dev/null`
     system('cat /tmp/no_such_file &> /dev/null')
   end
-
- 
 end
