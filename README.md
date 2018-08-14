@@ -69,21 +69,21 @@ Example config.yml:
   DATABASE_NAME:
     value: dbname
 
-service: &service
+srv1: &srv1
   <<: [*dbconfig]
   LOG_LEVEL:
     value: debug
   CA_CERT:
     file: /tmp/ca/cacert.pem
   CLIENT_CERT:
-    value: consul://services/ca/private/service/cert.pem
+    value: consul://services/ca/private/cert.pem
   CLIENT_KEY:
-    value: consul://services/ca/private/service/key.pem
+    value: consul://services/ca/private/key.pem
 
-smev3-assistant:
-  <<: *smev3
+srv2:
+  <<: *srv1
   CA_CERT:
-    value: consul://services/env/service/ca_cert
+    value: consul://services/env/srv1/ca_cert
 ```
 
 ### merger.rb
