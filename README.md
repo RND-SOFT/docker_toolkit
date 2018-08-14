@@ -37,7 +37,7 @@ Usage: waiter.rb [options] -- exec
 
 ### consul.rb
 
-Helper to use Consul in 12Factor application:
+Helper to use Consul in 12Factor application. Inspired by https://github.com/hashicorp/envconsul:
 
 * export Consul key/value as environment variables
 * references in Consul key/value store
