@@ -35,7 +35,7 @@ module DockerToolkit
 
       terminating.each do |meta|
         begin
-          meta[:process].poll_for_exit(10)
+          meta[:process].poll_for_exit(5)
         rescue ChildProcess::TimeoutError
           meta[:process].stop(1)
           meta[:stdout].close
@@ -75,6 +75,7 @@ module DockerToolkit
         end
 
     def add(*cmd)
+      cmd = cmd.flatten.map{|c| c.to_s.strip }.reject(&:empty?)
       process = ChildProcess.build(*cmd)
 
       rerr, werr = IO.pipe

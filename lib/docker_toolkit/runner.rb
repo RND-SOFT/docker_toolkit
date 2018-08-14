@@ -37,6 +37,24 @@ module DockerToolkit
       env[key]
     end
 
+    def envsubst(*paths)
+      paths = paths.flatten.map{|c| c.to_s.strip }.reject(&:empty?)
+      paths.each do |path|
+        Dir.glob("#{path}/**/*.in") do |templ|
+          output = templ.sub(/\.in$/, '')
+          cmd = "cat '#{templ}' | envsubst > '#{output}'"
+          system(cmd) || die("envsubst failed: #{cmd}")
+        end
+      end
+    end
+
+    def envsubst_file(templ, output = nil)
+      output ||= templ.sub(/\.in$/, '')
+      die('filename must ends with .in or output must be provided') if output.strip == templ.strip
+      cmd = "cat '#{templ}' | envsubst > '#{output}'"
+      system(cmd) || die("envsubst failed: #{cmd}")
+    end
+
   end
 
 end
