@@ -5,7 +5,7 @@ Helper tools for work with docker and consul
 
 ## Scripts
 
-Some useful scripts to run inside container
+Some useful scripts to run inside or outside container
 
 ### waiter.rb
 
