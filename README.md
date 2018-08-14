@@ -40,7 +40,7 @@ Usage: waiter.rb [options] -- exec
 Helper to use Consul in 12Factor application:
 
 * export Consul key/value as environment variables
-* referencese in Consul key/value store
+* references in Consul key/value store
 * read config file and store values in Consul
 * read files and store it in Consul key/value  store
 
