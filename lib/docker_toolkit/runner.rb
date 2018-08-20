@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'English'
+
 module DockerToolkit
 
   module Runner

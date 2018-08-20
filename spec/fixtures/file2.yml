@@ -1,7 +1,9 @@
 version: "3.4"
 services:
   base:
-    image: aaaa
+    extends:
+      file: base.yml
+      service: basebase
     networks:
       - bus2
     deploy:

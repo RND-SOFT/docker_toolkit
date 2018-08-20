@@ -75,11 +75,13 @@ def process_compose_hash(yml, dirname, parent = {})
                file.gsub!("${#{k}}", v)
              end
 
-             tmp = if File.exist?(dirname + '/' + file)
-                     YAML.load(File.read(dirname + '/' + file))
+             file_to_load = if File.exist?(dirname + '/' + file)
+                     dirname + '/' + file
                    else
-                     YAML.load(File.read(file))
-             end
+                     file
+                    end
+
+             tmp = process_compose_hash(YAML.load(File.read(file_to_load)), File.dirname(file_to_load), service)
 
              begin
                  (tmp['services'][ext['service']] || {})
