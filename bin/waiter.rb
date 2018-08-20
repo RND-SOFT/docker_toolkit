@@ -134,7 +134,7 @@ def wait_for_consul
   ret = wait_for @opts[:timeout] do
     cmd = "consul operator raft list-peers -http-addr=#{@opts[:consul_addr]} > /dev/null 2>&1"
     system(cmd)
-    $CHILD_STATUS.success?
+    $?.success?
   end
 
   yield(ret)
@@ -156,7 +156,7 @@ def wait_for_tcp
   ret = wait_for @opts[:timeout] do
     cmd = "nc -z #{@opts[:host]} #{@opts[:port]} > /dev/null 2>&1"
     system(cmd)
-    $CHILD_STATUS.success?
+    $?.success?
   end
 
   yield(ret)
@@ -167,7 +167,7 @@ def wait_for_db
   ret = wait_for @opts[:timeout] do
     cmd = "psql -lqt #{@pg[:user]} #{@pg[:pass]} #{@pg[:host]} #{@pg[:port]} #{@pg[:db]} 2>/dev/null | cut -d \\| -f 1 | grep -qw #{@opts[:db]} > /dev/null 2>&1"
     system(cmd)
-    $CHILD_STATUS.success?
+    $?.success?
   end
 
   yield(ret)
@@ -178,7 +178,7 @@ def wait_for_tb
   ret = wait_for @opts[:timeout] do
     cmd = "echo \"\\dt\" | psql -qt #{@pg[:user]} #{@pg[:pass]} #{@pg[:host]} #{@pg[:port]} #{@pg[:db]} 2>/dev/null | cut -d \\| -f 2 | grep -qw #{@pg[:tb]} > /dev/null 2>&1"
     system(cmd)
-    $CHILD_STATUS.success?
+    $?.success?
   end
 
   yield(ret)

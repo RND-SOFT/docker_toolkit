@@ -76,9 +76,9 @@ def process_compose_hash(yml, dirname, parent = {})
              end
 
              file_to_load = if File.exist?(dirname + '/' + file)
-                     dirname + '/' + file
-                   else
-                     file
+                              dirname + '/' + file
+                            else
+                              file
                     end
 
              tmp = process_compose_hash(YAML.load(File.read(file_to_load)), File.dirname(file_to_load), service)

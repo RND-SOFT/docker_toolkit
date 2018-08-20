@@ -39,6 +39,9 @@ Style/Lambda:
   
 Style/RaiseArgs:
   EnforcedStyle: compact
+
+Style/SpecialGlobalVars:
+  Enabled: false
     
 Metrics/LineLength:
   Max: 100

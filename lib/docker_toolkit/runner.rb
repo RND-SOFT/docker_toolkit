@@ -30,7 +30,7 @@ module DockerToolkit
 
     def execute!(cmd, error = nil)
       output = execute(cmd)
-      $CHILD_STATUS.success? || die(error || "Can't execute: #{cmd}")
+      $?.success? || die(error || "Can't execute: #{cmd}")
       output
     end
 

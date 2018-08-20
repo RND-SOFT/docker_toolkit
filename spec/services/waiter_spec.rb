@@ -58,13 +58,13 @@ RSpec.describe 'waiter.rb' do
 
     it 'wait for TCP timedout' do
       system("#{waiter_cmd} --tcp localhost:#{@port + 42} -- #{exec_cmd}")
-      expect($CHILD_STATUS.success?).to be_falsey
+      expect($?.success?).to be_falsey
       expect(File.read(result_file)).not_to be eq content
     end
 
     it 'wait for TCP ok' do
       system("#{waiter_cmd} --tcp localhost:#{@port} -- #{exec_cmd}")
-      expect($CHILD_STATUS.success?).to be_truthy
+      expect($?.success?).to be_truthy
       expect(File.read(result_file).strip).to eq content
     end
   end
@@ -73,13 +73,13 @@ RSpec.describe 'waiter.rb' do
     it 'wait for file success' do
       file = Tempfile.new('file')
       system("#{waiter_cmd} -f #{file.path}")
-      expect($CHILD_STATUS.success?).to be_truthy
+      expect($?.success?).to be_truthy
       file.unlink
     end
 
     it 'wait for file timeout' do
       system("#{waiter_cmd} --file #{SecureRandom.hex}")
-      expect($CHILD_STATUS.success?).to be_falsey
+      expect($?.success?).to be_falsey
     end
   end
 end
