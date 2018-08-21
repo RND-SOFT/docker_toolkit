@@ -22,6 +22,7 @@ INTERVAL = 3
 @opts[:timeout] = TIMEOUT
 @opts[:interval] = INTERVAL
 @opts[:consul_addr] = 'http://localhost:8500'
+@opts[:consul_service_count] = 1
 
 
 OptionParser.new do |o|
@@ -56,6 +57,10 @@ OptionParser.new do |o|
 
   o.on('--consul-service service', 'Wait for service appear in consul') do |service|
     @opts[:consul_service] = service
+  end
+
+  o.on("--consul-service-count count=#{@opts[:consul_service_count]}", 'Wait for this count of service appear in consul') do |count|
+    @opts[:consul_service_count] = count.to_i
   end
 
   o.on('--user user', 'username') do |user|
@@ -143,9 +148,9 @@ end
 def wait_for_consul_service(service)
   log("Waiting for consul service #{service}...")
   ret = wait_for @opts[:timeout] do
-    cmd = "curl -s #{@opts[:consul_addr]}/v1/health/service/#{service}?passing | wc -c"
-    bytes = `#{cmd}`.to_i
-    bytes > 10
+    cmd = "curl -s #{@opts[:consul_addr]}/v1/health/service/#{service}?passing"
+    result = JSON.parse(`#{cmd}`) rescue []
+    result.count >= @opts[:consul_service_count]
   end
 
   yield(ret)

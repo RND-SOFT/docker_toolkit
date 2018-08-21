@@ -27,6 +27,7 @@ Usage: waiter.rb [options] -- exec
                                      HTTP addres to connect to consul
         --consul                     Wait for local consul agent to be ready
         --consul-service service     Wait for service appear in consul
+        --consul-service-count count  Wait for this count services appear in consul
         --user user                  username
         --pass pass                  password
     -t, --timeout secs=15            Total timeout

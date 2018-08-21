@@ -25,12 +25,14 @@ module DockerToolkit
 
     def execute(cmd)
       puts "Executing: #{cmd}"
-      `#{cmd}`
+      output = `#{cmd}`
+      @last_result = $?
+      output
     end
 
     def execute!(cmd, error = nil)
       output = execute(cmd)
-      $?.success? || die(error || "Can't execute: #{cmd}")
+      ($? || @last_result).success? || die(error || "Can't execute: #{cmd}")
       output
     end
 
