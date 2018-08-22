@@ -5,6 +5,7 @@ require 'securerandom'
 require 'English'
 require 'openssl'
 require 'tempfile'
+require 'json'
 
 STDOUT.sync = true
 STDERR.sync = true
@@ -61,6 +62,10 @@ OptionParser.new do |o|
 
   o.on("--consul-service-count count=#{@opts[:consul_service_count]}", 'Wait for this count of service appear in consul') do |count|
     @opts[:consul_service_count] = count.to_i
+  end
+
+  o.on("--consul-tag tag", 'Filter consul service by tag') do |tag|
+    @opts[:consul_tag] = tag.to_s
   end
 
   o.on('--user user', 'username') do |user|
@@ -149,7 +154,9 @@ def wait_for_consul_service(service)
   log("Waiting for consul service #{service}...")
   ret = wait_for @opts[:timeout] do
     cmd = "curl -s #{@opts[:consul_addr]}/v1/health/service/#{service}?passing"
-    result = JSON.parse(`#{cmd}`) rescue []
+    cmd += "&tag=#{@opts[:consul_tag]}" if @opts[:consul_tag]
+    result = `#{cmd}`
+    result = JSON.parse(result) rescue []
     result.count >= @opts[:consul_service_count]
   end
 
