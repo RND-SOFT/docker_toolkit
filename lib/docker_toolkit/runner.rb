@@ -6,6 +6,17 @@ module DockerToolkit
 
   module Runner
 
+    def init_service service
+      STDOUT.sync = true
+      STDERR.sync = true
+
+      puts "Starting #{service}..."
+
+      trap('EXIT') do
+        puts "Stopping #{service}..."
+      end
+    end
+
     def error(message)
       STDERR.puts "Error: #{message}"
     end
