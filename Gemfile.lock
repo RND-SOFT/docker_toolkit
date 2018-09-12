@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    docker_toolkit (0.1.19)
+    docker_toolkit (0.1.20)
       diplomat
       dotenv
       json

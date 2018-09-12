@@ -30,7 +30,18 @@ module DockerToolkit
         rescue StandardError
           nil
         end
-        ::Process.kill 'TERM', meta[:process].pid
+        if meta[:termcmd].is_a? String
+          log "Terminating by #{meta[:termcmd].gsub('%PID%', meta[:process].pid.to_s)}..."
+          output = `#{meta[:termcmd].gsub('%PID%', meta[:process].pid.to_s)}`
+          if $?.success?
+            log "ok: #{output}"
+          else
+            log "Error: #{output}"
+            ::Process.kill 'TERM', meta[:process].pid
+          end
+        else
+          ::Process.kill 'TERM', meta[:process].pid
+        end
       end
 
       terminating.each do |meta|
@@ -75,6 +86,13 @@ module DockerToolkit
         end
 
     def add(*cmd)
+      options = cmd.last
+      if options.is_a? Hash
+        cmd.pop
+      else
+        options = {}
+      end
+
       cmd = cmd.flatten.map{|c| c.to_s.strip }.reject(&:empty?)
       process = ChildProcess.build(*cmd)
 
@@ -90,7 +108,8 @@ module DockerToolkit
         process: process,
         stdout: rout,
         stderr: rerr,
-        stdin: process.io.stdin
+        stdin: process.io.stdin,
+        termcmd: options[:termcmd],
       }
 
       @threads << Thread.new(meta[:stdout], STDOUT) do |io, out|
