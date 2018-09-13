@@ -13,7 +13,7 @@ DockerToolkit::Watcher.new.exec do |w|
 
   Thread.new do
     sleep 2
-    #crash myself
+    # crash myself
     puts `ls /tmp/no_such_file &> /dev/null`
     system('cat /tmp/no_such_file &> /dev/null')
   end

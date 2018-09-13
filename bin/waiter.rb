@@ -64,7 +64,7 @@ OptionParser.new do |o|
     @opts[:consul_service_count] = count.to_i
   end
 
-  o.on("--consul-tag tag", 'Filter consul service by tag') do |tag|
+  o.on('--consul-tag tag', 'Filter consul service by tag') do |tag|
     @opts[:consul_tag] = tag.to_s
   end
 
@@ -156,7 +156,11 @@ def wait_for_consul_service(service)
     cmd = "curl -s #{@opts[:consul_addr]}/v1/health/service/#{service}?passing"
     cmd += "&tag=#{@opts[:consul_tag]}" if @opts[:consul_tag]
     result = `#{cmd}`
-    result = JSON.parse(result) rescue []
+    result = begin
+               JSON.parse(result)
+             rescue StandardError
+               []
+             end
     result.count >= @opts[:consul_service_count]
   end
 

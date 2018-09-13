@@ -109,7 +109,7 @@ module DockerToolkit
         stdout: rout,
         stderr: rerr,
         stdin: process.io.stdin,
-        termcmd: options[:termcmd],
+        termcmd: options[:termcmd]
       }
 
       @threads << Thread.new(meta[:stdout], STDOUT) do |io, out|

@@ -6,7 +6,7 @@ module DockerToolkit
 
   module Runner
 
-    def init_service service
+    def init_service(service)
       STDOUT.sync = true
       STDERR.sync = true
 
@@ -32,6 +32,11 @@ module DockerToolkit
         env[k] = v
       end
       envs
+    end
+
+    def load_envs_from_consul(consul, service)
+      envs = execute!("consul.rb --consul=http://#{consul}:8500 --env services/env/#{service} --pristine -d", "Can't load envs")
+      load_envs(envs)
     end
 
     def execute(cmd)
