@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    docker_toolkit (0.1.21)
+    docker_toolkit (0.1.22)
       diplomat
       dotenv
       json
@@ -15,7 +15,7 @@ GEM
       faraday (~> 0.9)
       json
     dotenv (2.5.0)
-    faraday (0.15.2)
+    faraday (0.15.3)
       multipart-post (>= 1.2, < 3)
     json (2.1.0)
     multipart-post (2.0.0)
