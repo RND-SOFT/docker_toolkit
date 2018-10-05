@@ -167,7 +167,7 @@ module DockerToolkit
           meta[:handled] || !meta[:process].exited?
         end
 
-        unhandled.any? do |meta|
+        completed = unhandled.any? do |meta|
           log 'Child finished'
           log "  Process[#{meta[:pid]}]: #{meta[:cmd]}"
           log "    status: #{meta[:process].crashed? ? 'crashed' : 'exited'}"
@@ -203,6 +203,12 @@ module DockerToolkit
 
           true
         end
+
+        unless completed  
+          pid, status = Process.waitpid2(-1, Process::WNOHANG)
+          log "Subprocess finished: #{status.inspect}"
+        end
+
       end
 
       begin
