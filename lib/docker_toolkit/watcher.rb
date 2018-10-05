@@ -205,8 +205,10 @@ module DockerToolkit
         end
 
         unless completed  
-          pid, status = Process.waitpid2(-1, Process::WNOHANG)
-          log "Subprocess finished: #{status.inspect}"
+          pid, status = Process.waitpid2(-1, Process::WNOHANG) rescue nil
+          if status
+            log "Subprocess finished: #{status.inspect}"
+          end
         end
 
       end
