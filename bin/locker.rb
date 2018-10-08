@@ -2,10 +2,9 @@
 
 require 'optparse'
 require 'diplomat'
-require 'json'
 
 @opts = {
-  url: 'http://localhost:8080',
+  url: 'http://localhost:8500',
   timeout: 10,
   ttl: 30*60,
 }
@@ -40,8 +39,8 @@ parser.parse!
 
 
 def lock session, locker, timeout
-  Timeout::timeout(timeout) do 
-    return Diplomat::Lock.wait_to_acquire("/resource/#{locker[:resource]}/lock", session, locker.to_json, 10)
+  Timeout::timeout(timeout) do
+    return Diplomat::Lock.wait_to_acquire("resource/#{locker[:resource]}/lock", session, locker.to_json, 10)
   end
 
 rescue Timeout::Error => e
