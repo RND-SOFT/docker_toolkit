@@ -101,9 +101,9 @@ if @opts[:db]
   @pg[:db] = "-d #{@opts[:db]}"
   @pg[:user] = "-U #{@opts[:user]}" if @opts[:user]
   @pg[:pass] = if @opts[:pass] && !@opts[:pass].empty?
-                 "-W #{@opts[:pass]}"
+                 "PGPASSWORD=#{@opts[:pass]}"
                else
-                 '-w'
+                 ''
   end
 
   @pg[:host] = "-h #{@opts[:host]}" if @opts[:host]
@@ -181,7 +181,7 @@ end
 def wait_for_db
   log("Waiting for DB: pg://#{@opts[:user]}:#{@opts[:pass]}@#{@opts[:host]}:#{@opts[:port]}/#{@opts[:db]}...")
   ret = wait_for @opts[:timeout] do
-    cmd = "psql -lqt #{@pg[:user]} #{@pg[:pass]} #{@pg[:host]} #{@pg[:port]} #{@pg[:db]} 2>/dev/null | cut -d \\| -f 1 | grep -qw #{@opts[:db]} > /dev/null 2>&1"
+    cmd = "#{@pg[:pass]} psql -lqt #{@pg[:user]} #{@pg[:host]} #{@pg[:port]} #{@pg[:db]} 2>/dev/null | cut -d \\| -f 1 | grep -qw #{@opts[:db]} > /dev/null 2>&1"
     system(cmd)
     $?.success?
   end
