@@ -26,9 +26,7 @@ Gem::Specification.new do |spec|
   end
 
 
-  spec.add_dependency 'diplomat'
-  spec.add_dependency 'dotenv'
-  spec.add_dependency 'json'
+  spec.add_dependency 'aggkit'
 
   spec.add_development_dependency 'bundler', '~> 1.14'
   spec.add_development_dependency 'rake', '~> 10.0'
